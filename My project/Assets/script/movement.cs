@@ -7,17 +7,20 @@ public class movement : MonoBehaviour
     Vector3 Move;
     float horizontal,vertical;
     public float speed,jumpForce;
+    float RUNspeed,aux;
     public GameObject direction;
     public GameObject Model;
     Vector3 flatRight,flatForward;
 
     public Animator animator;
-    public AnimationClip walkAnimation,IdleAnimation,jumpAnimation;
+    public AnimationClip walkAnimation,IdleAnimation,jumpAnimation,RunAnimation;
 
     Rigidbody rb;
 
      void Awake()
     {
+        aux = speed;
+        RUNspeed = speed * 2;
         rb=GetComponent<Rigidbody>();
         inputActions = new Player();
         inputActions.Moving.Enable();
@@ -70,9 +73,20 @@ public class movement : MonoBehaviour
         if(horizontal != 0 || vertical != 0)
         {
             Model.transform.forward = Move;
-            animator.Play(walkAnimation.name);
+            if(inputActions.Moving.Sprint.ReadValue<float>() > 0)
+            {
+                speed = RUNspeed;
+                animator.Play(RunAnimation.name);
+            }
+            else
+            {
+                speed = aux;
+                animator.Play(walkAnimation.name);
+            }
         }
 
-        rb.MovePosition(rb.position + speed * Time.deltaTime * Move);
+        // Use velocity instead of MovePosition
+        Vector3 targetVelocity = Move * speed;
+        rb.linearVelocity = new Vector3(targetVelocity.x, rb.linearVelocity.y, targetVelocity.z);
     }
 }

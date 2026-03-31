@@ -50,7 +50,7 @@ ModelImporter:
     resampleCurves: 1
     optimizeGameObjects: 0
     removeConstantScaleCurves: 1
-    motionNodeName: 
+    motionNodeName: <Root Transform>
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -66,9 +66,9 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Armature|mixamo.com
+      name: Idle
       takeName: Armature|mixamo.com
-      internalID: -4572650651892053679
+      internalID: -6624095233613197302
       firstFrame: 0
       lastFrame: 1
       wrapMode: 0
