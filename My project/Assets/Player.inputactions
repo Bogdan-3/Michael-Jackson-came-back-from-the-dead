@@ -225,6 +225,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Combats",
+            "id": "7fda23de-1495-488b-8e9b-eb621aebe9ef",
+            "actions": [
+                {
+                    "name": "SpinKicks",
+                    "type": "Button",
+                    "id": "80a4b5b0-a573-4518-bcbe-dd15107829e7",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "8368b2ec-4382-481c-b695-7faa1be9c2b2",
+                    "path": "<Keyboard>/#(Q)",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SpinKicks",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []

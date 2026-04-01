@@ -311,6 +311,34 @@ public partial class @Player: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Combats"",
+            ""id"": ""7fda23de-1495-488b-8e9b-eb621aebe9ef"",
+            ""actions"": [
+                {
+                    ""name"": ""SpinKicks"",
+                    ""type"": ""Button"",
+                    ""id"": ""80a4b5b0-a573-4518-bcbe-dd15107829e7"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""8368b2ec-4382-481c-b695-7faa1be9c2b2"",
+                    ""path"": ""<Keyboard>/#(Q)"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SpinKicks"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -325,12 +353,16 @@ public partial class @Player: IInputActionCollection2, IDisposable
         m_Moving_Vertical = m_Moving.FindAction("Vertical", throwIfNotFound: true);
         m_Moving_Jump = m_Moving.FindAction("Jump", throwIfNotFound: true);
         m_Moving_Sprint = m_Moving.FindAction("Sprint", throwIfNotFound: true);
+        // Combats
+        m_Combats = asset.FindActionMap("Combats", throwIfNotFound: true);
+        m_Combats_SpinKicks = m_Combats.FindAction("SpinKicks", throwIfNotFound: true);
     }
 
     ~@Player()
     {
         UnityEngine.Debug.Assert(!m_Camera.enabled, "This will cause a leak and performance issues, Player.Camera.Disable() has not been called.");
         UnityEngine.Debug.Assert(!m_Moving.enabled, "This will cause a leak and performance issues, Player.Moving.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_Combats.enabled, "This will cause a leak and performance issues, Player.Combats.Disable() has not been called.");
     }
 
     /// <summary>
@@ -638,6 +670,102 @@ public partial class @Player: IInputActionCollection2, IDisposable
     /// Provides a new <see cref="MovingActions" /> instance referencing this action map.
     /// </summary>
     public MovingActions @Moving => new MovingActions(this);
+
+    // Combats
+    private readonly InputActionMap m_Combats;
+    private List<ICombatsActions> m_CombatsActionsCallbackInterfaces = new List<ICombatsActions>();
+    private readonly InputAction m_Combats_SpinKicks;
+    /// <summary>
+    /// Provides access to input actions defined in input action map "Combats".
+    /// </summary>
+    public struct CombatsActions
+    {
+        private @Player m_Wrapper;
+
+        /// <summary>
+        /// Construct a new instance of the input action map wrapper class.
+        /// </summary>
+        public CombatsActions(@Player wrapper) { m_Wrapper = wrapper; }
+        /// <summary>
+        /// Provides access to the underlying input action "Combats/SpinKicks".
+        /// </summary>
+        public InputAction @SpinKicks => m_Wrapper.m_Combats_SpinKicks;
+        /// <summary>
+        /// Provides access to the underlying input action map instance.
+        /// </summary>
+        public InputActionMap Get() { return m_Wrapper.m_Combats; }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
+        public void Enable() { Get().Enable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
+        public void Disable() { Get().Disable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
+        public bool enabled => Get().enabled;
+        /// <summary>
+        /// Implicitly converts an <see ref="CombatsActions" /> to an <see ref="InputActionMap" /> instance.
+        /// </summary>
+        public static implicit operator InputActionMap(CombatsActions set) { return set.Get(); }
+        /// <summary>
+        /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <param name="instance">Callback instance.</param>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
+        /// </remarks>
+        /// <seealso cref="CombatsActions" />
+        public void AddCallbacks(ICombatsActions instance)
+        {
+            if (instance == null || m_Wrapper.m_CombatsActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_CombatsActionsCallbackInterfaces.Add(instance);
+            @SpinKicks.started += instance.OnSpinKicks;
+            @SpinKicks.performed += instance.OnSpinKicks;
+            @SpinKicks.canceled += instance.OnSpinKicks;
+        }
+
+        /// <summary>
+        /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <remarks>
+        /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
+        /// </remarks>
+        /// <seealso cref="CombatsActions" />
+        private void UnregisterCallbacks(ICombatsActions instance)
+        {
+            @SpinKicks.started -= instance.OnSpinKicks;
+            @SpinKicks.performed -= instance.OnSpinKicks;
+            @SpinKicks.canceled -= instance.OnSpinKicks;
+        }
+
+        /// <summary>
+        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="CombatsActions.UnregisterCallbacks(ICombatsActions)" />.
+        /// </summary>
+        /// <seealso cref="CombatsActions.UnregisterCallbacks(ICombatsActions)" />
+        public void RemoveCallbacks(ICombatsActions instance)
+        {
+            if (m_Wrapper.m_CombatsActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        /// <summary>
+        /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
+        /// </remarks>
+        /// <seealso cref="CombatsActions.AddCallbacks(ICombatsActions)" />
+        /// <seealso cref="CombatsActions.RemoveCallbacks(ICombatsActions)" />
+        /// <seealso cref="CombatsActions.UnregisterCallbacks(ICombatsActions)" />
+        public void SetCallbacks(ICombatsActions instance)
+        {
+            foreach (var item in m_Wrapper.m_CombatsActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_CombatsActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    /// <summary>
+    /// Provides a new <see cref="CombatsActions" /> instance referencing this action map.
+    /// </summary>
+    public CombatsActions @Combats => new CombatsActions(this);
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Camera" which allows adding and removing callbacks.
     /// </summary>
@@ -695,5 +823,20 @@ public partial class @Player: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnSprint(InputAction.CallbackContext context);
+    }
+    /// <summary>
+    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Combats" which allows adding and removing callbacks.
+    /// </summary>
+    /// <seealso cref="CombatsActions.AddCallbacks(ICombatsActions)" />
+    /// <seealso cref="CombatsActions.RemoveCallbacks(ICombatsActions)" />
+    public interface ICombatsActions
+    {
+        /// <summary>
+        /// Method invoked when associated input action "SpinKicks" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSpinKicks(InputAction.CallbackContext context);
     }
 }
