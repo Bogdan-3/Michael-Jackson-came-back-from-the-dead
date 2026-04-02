@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class movement : MonoBehaviour
+public class Movement : MonoBehaviour
 {
     Player inputActions;
     Vector3 Move;
@@ -29,7 +29,7 @@ public class movement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(horizontal == 0 && vertical == 0 && !animator.GetCurrentAnimatorStateInfo(0).IsName(jumpAnimation.name))
+        if(horizontal == 0 && vertical == 0 && !animator.GetCurrentAnimatorStateInfo(0).IsName(jumpAnimation.name) && !animator.GetCurrentAnimatorStateInfo(0).IsName("Spin Kick"))
         {
             animator.Play(IdleAnimation.name);
         }

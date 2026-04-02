@@ -953,6 +953,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a53fbbfb9b4d93d95a60c0badea43929, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  movementScript: {fileID: 1840135120}
   SpinKick: {fileID: 7400000, guid: f177080da1d1181ac8724d2b02a5e78c, type: 2}
   animator: {fileID: 1963874484}
 --- !u!1 &1916792460 stripped
