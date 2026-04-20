@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
-    Player inputActions;
+    public static Player inputActions;
     Vector3 Move;
     float horizontal,vertical;
     public float speed,jumpForce;
